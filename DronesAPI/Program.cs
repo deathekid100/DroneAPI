@@ -1,4 +1,6 @@
+using AutoMapper;
 using DronesAPI.Data;
+using DronesAPI.Dtos;
 using DronesAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +12,7 @@ builder.Services.AddDbContext<DroneDBContext>(options =>
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
