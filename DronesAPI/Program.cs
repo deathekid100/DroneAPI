@@ -1,7 +1,6 @@
-using AutoMapper;
 using DronesAPI.Data;
 using DronesAPI.Dtos;
-using DronesAPI.Models;
+using DronesAPI.Services;
 using DronesAPI.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,7 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(DroneValidator));
 builder.Services.AddValidatorsFromAssemblyContaining(typeof(MedicationValidator));
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<IDispatchService, DispatchService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -22,6 +22,27 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.MapPost("api/v1/dispatch/registerdrone", async (IDispatchService dispatchService,CreateDroneDto createDrone) =>
+{
+    var validation = await dispatchService.ValidateDrone(createDrone);
+    if (!validation!.IsValid)
+    {
+        return Results.ValidationProblem(validation.ToDictionary());
+    }
+    var result = await dispatchService.RegisterDrone(createDrone);
+
+    return Results.Created($"api/v1/drone/{result.Id}", result);
+});
+
+app.MapGet("api/v1/dispatch/getdrone/{id}", async (IDispatchService dispatchService, int id) =>
+{
+    var drone = await dispatchService.GetDroneById(id);
+    if(drone == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(drone);
+});
 
 if (app.Environment.IsDevelopment())
 {

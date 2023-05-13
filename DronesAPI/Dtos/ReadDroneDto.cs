@@ -6,6 +6,7 @@ namespace DronesAPI.Dtos
     public class ReadDroneDto
     {
 
+        public int Id { get; set; }
         public string SerialNumber { get; set; }
 
         public DroneModel Model { get; set; }
