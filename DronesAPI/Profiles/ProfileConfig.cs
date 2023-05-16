@@ -12,6 +12,7 @@ namespace DronesAPI.Config
             CreateMap<Drone, LoadedDroneDto>();
             CreateMap<CreateDroneDto, Drone>();
             CreateMap<Medication, ReadMedicationsDto>();
+            CreateMap<ReadMedicationsDto, Medication>();
         }
     }
 }

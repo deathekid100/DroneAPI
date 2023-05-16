@@ -37,5 +37,38 @@ namespace DronesAPI.Services
             var drone = await _unitOfWork.DroneRepository.FirstOrDefaultAsync(t => t.Id == id);
             return _mapper.Map<ReadDroneDto>(drone);
         }
+        public async Task<Drone>LoadDroneWithMedications(Drone drone, List<ReadMedicationsDto> medications)
+        {
+            drone.State = DroneState.LOADING;
+            _unitOfWork.DroneRepository.Update(drone);
+            await _unitOfWork.CommitAsync();
+            
+            var medicatinsMapped = _mapper.Map<List<Medication>>(medications);
+            drone.Medications = medicatinsMapped;
+            drone.State = DroneState.LOADED;
+            
+            _unitOfWork.DroneRepository.Update(drone);
+            await _unitOfWork.CommitAsync();
+            
+            return drone;
+        }
+        public async Task<bool>CheckMedications(List<ReadMedicationsDto> medications)
+        {
+            var medicationsIds = medications.Select(t => t.Id);
+            var found = await _unitOfWork.MedicationRepository.FindAllAsync(t => medicationsIds.Contains(t.Id));
+            return found.Count() == medications.Count;
+        }
+        public async Task<ICollection<ReadDroneDto>>GetMedications(int droneId)
+        {
+            var medications = await _unitOfWork.MedicationRepository.FindAllAsync(t => t.DroneId == droneId);
+            return _mapper.Map<ICollection<ReadDroneDto>>(medications);
+        }
+        public async Task<ICollection<ReadDroneDto>> GetAvailableDrones()
+        {
+            var availables = await _unitOfWork.DroneRepository
+                .FindAllAsync(t => t.State == DroneState.IDLE && t.BatteryCapacity > 25);
+
+            return _mapper.Map<ICollection<ReadDroneDto>>(availables);
+        }
     }
 }
