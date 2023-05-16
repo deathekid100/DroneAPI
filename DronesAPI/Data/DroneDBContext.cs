@@ -12,5 +12,6 @@ namespace DronesAPI.Data
         }
         public DbSet<Drone> Drones { get; set; }
         public DbSet<Medication> Medications { get; set; }
+        public DbSet<DroneLog> DroneLogs { get; set; }
     }
 }
