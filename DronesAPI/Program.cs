@@ -19,6 +19,7 @@ builder.Services.AddTransient<IDispatchService, DispatchService>();
 builder.Services.AddTransient<IAuditService, AuditService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddEndpointsApiExplorer();
@@ -27,6 +28,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<AuditJob>();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DroneDBContext>();
+    var dataSeeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    dataSeeder.SeedData();
+}
+
 
 app.MapPost("api/v1/drone", async (IDispatchService dispatchService, CreateDroneDto createDrone) =>
 {
@@ -40,14 +48,16 @@ app.MapPost("api/v1/drone", async (IDispatchService dispatchService, CreateDrone
     return Results.Created($"api/v1/drone/{result.Id}", result);
 });
 
-app.MapGet("api/v1/drone/{id}", async (IDispatchService dispatchService, int id) =>
+app.MapGet("api/v1/drone/{id}/medications", async (IDispatchService dispatchService, int id) =>
 {
     var drone = await dispatchService.GetDroneById(id);
     if (drone == null)
     {
         return Results.NotFound();
     }
-    return Results.Ok(drone);
+    var medications = await dispatchService.GetMedications(id);
+    
+    return Results.Ok(medications);
 });
 
 app.MapGet("api/v1/drone/{id}/BatteryLevel", async (IDispatchService dispatchService, int id) =>
@@ -60,7 +70,7 @@ app.MapGet("api/v1/drone/{id}/BatteryLevel", async (IDispatchService dispatchSer
     return Results.Ok(drone.BatteryCapacity);
 });
 
-app.MapPost("api/v1/drone/{id}/load", async (IDispatchService dispatchService, List<ReadMedicationsDto> medications, int id) =>
+app.MapPost("api/v1/drone/{id}/load", async (IDispatchService dispatchService, List<int> medicationsIds, int id) =>
 {
     var drone = await dispatchService.GetDroneById(id);
     if (drone == null)
@@ -71,23 +81,25 @@ app.MapPost("api/v1/drone/{id}/load", async (IDispatchService dispatchService, L
     {
         return Results.BadRequest("Drone is being used");
     }
-    if (drone.BatteryCapacity < 25)
-    {
-        return Results.BadRequest("Battery level is below 25%");
-    }
+    var medications = await dispatchService.GetAllMedicationsFromIds(medicationsIds);
     double totalWeight = medications.Sum(m => m.Weight);
-    
+
     if (drone.WeightLimit < totalWeight)
     {
         return Results.BadRequest("Drone weight limit exceeded");
     }
-    
-    if (! await dispatchService.CheckMedications(medications))
+    if (drone.BatteryCapacity < 25)
+    {
+        return Results.BadRequest("Battery level is below 25%");
+    }
+
+    if (medications.Count != medicationsIds.Count)
     {
         return Results.BadRequest("One or more medications are not found");
     }
-
-    return Results.Created($"api/v1/drone/{id}/medications", drone);
+    var result = await dispatchService.LoadDroneWithMedications(id, medications);
+    
+    return Results.Created($"api/v1/drone/{id}/medications", result);
 });
 
 app.MapGet("api/v1/drone/available", async (IDispatchService dispatchService) =>
