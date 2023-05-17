@@ -6,11 +6,11 @@ namespace DronesAPI.Services
 {
     public interface IDispatchService
     {
-        Task<bool> CheckMedications(List<ReadMedicationsDto> medications);
+        Task<List<Medication>> GetAllMedicationsFromIds(List<int> medicationsIds);
         Task<ICollection<ReadDroneDto>> GetAvailableDrones();
         Task<ReadDroneDto> GetDroneById(int id);
-        Task<ICollection<ReadDroneDto>> GetMedications(int droneId);
-        Task<Drone> LoadDroneWithMedications(Drone drone, List<ReadMedicationsDto> medications);
+        Task<ICollection<ReadMedicationsDto>> GetMedications(int droneId);
+        Task<ICollection<ReadMedicationsDto>> LoadDroneWithMedications(int droneId, List<Medication> medications);
         Task<ReadDroneDto> RegisterDrone(CreateDroneDto createDrone);
         Task<ValidationResult?> ValidateDrone(CreateDroneDto createDrone);
     }

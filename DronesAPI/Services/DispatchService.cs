@@ -37,31 +37,25 @@ namespace DronesAPI.Services
             var drone = await _unitOfWork.DroneRepository.FirstOrDefaultAsync(t => t.Id == id);
             return _mapper.Map<ReadDroneDto>(drone);
         }
-        public async Task<Drone>LoadDroneWithMedications(Drone drone, List<ReadMedicationsDto> medications)
+        public async Task<ICollection<ReadMedicationsDto>>LoadDroneWithMedications(int droneId, List<Medication> medications)
         {
+            var drone = await _unitOfWork.DroneRepository.FirstOrDefaultAsync(t => t.Id == droneId);
             drone.State = DroneState.LOADING;
             _unitOfWork.DroneRepository.Update(drone);
             await _unitOfWork.CommitAsync();
             
-            var medicatinsMapped = _mapper.Map<List<Medication>>(medications);
-            drone.Medications = medicatinsMapped;
+            drone.Medications = medications;
             drone.State = DroneState.LOADED;
             
             _unitOfWork.DroneRepository.Update(drone);
             await _unitOfWork.CommitAsync();
             
-            return drone;
+            return _mapper.Map<ICollection<ReadMedicationsDto>>(medications);
         }
-        public async Task<bool>CheckMedications(List<ReadMedicationsDto> medications)
-        {
-            var medicationsIds = medications.Select(t => t.Id);
-            var found = await _unitOfWork.MedicationRepository.FindAllAsync(t => medicationsIds.Contains(t.Id));
-            return found.Count() == medications.Count;
-        }
-        public async Task<ICollection<ReadDroneDto>>GetMedications(int droneId)
+        public async Task<ICollection<ReadMedicationsDto>>GetMedications(int droneId)
         {
             var medications = await _unitOfWork.MedicationRepository.FindAllAsync(t => t.DroneId == droneId);
-            return _mapper.Map<ICollection<ReadDroneDto>>(medications);
+            return _mapper.Map<ICollection<ReadMedicationsDto>>(medications);
         }
         public async Task<ICollection<ReadDroneDto>> GetAvailableDrones()
         {
@@ -69,6 +63,11 @@ namespace DronesAPI.Services
                 .FindAllAsync(t => t.State == DroneState.IDLE && t.BatteryCapacity > 25);
 
             return _mapper.Map<ICollection<ReadDroneDto>>(availables);
+        }
+        public async Task<List<Medication>> GetAllMedicationsFromIds(List<int> medicationsIds)
+        {
+            var found = await _unitOfWork.MedicationRepository.FindAllAsync(t => medicationsIds.Contains(t.Id));
+            return found.ToList();
         }
     }
 }
