@@ -16,8 +16,9 @@ namespace DronesAPI.Validators
             RuleFor(d => d.State).NotNull();
         }
 
-        private bool BeAValidModel(DroneModel model)
+        private bool BeAValidModel(DroneModel? model)
         {
+            if (model == null) return false;
             return Enum.IsDefined(typeof(DroneModel), model);
         }
     }

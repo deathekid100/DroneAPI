@@ -12,7 +12,7 @@ namespace DronesAPI.Models
         public string SerialNumber { get; set; }
 
         [Required]
-        public DroneModel Model { get; set; }
+        public DroneModel? Model { get; set; }
 
         [Required]
         [Range(0, 500)]
