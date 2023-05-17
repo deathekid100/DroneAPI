@@ -25,5 +25,6 @@ namespace DronesAPI.Models
         [Required]
         public DroneState State { get; set; }
         public List<Medication> Medications { get; set; }
+        public List<DroneLog> Logs { get; set; }
     }
 }

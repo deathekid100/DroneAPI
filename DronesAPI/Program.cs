@@ -1,5 +1,6 @@
 using DronesAPI.Data;
 using DronesAPI.Dtos;
+using DronesAPI.Jobs;
 using DronesAPI.Models;
 using DronesAPI.Services;
 using DronesAPI.Validators;
@@ -15,11 +16,15 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(MedicationValidator)
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IDispatchService, DispatchService>();
+builder.Services.AddTransient<IAuditService, AuditService>();
+
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<AuditJob>();
 
 var app = builder.Build();
 

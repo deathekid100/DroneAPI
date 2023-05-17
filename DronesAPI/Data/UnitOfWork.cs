@@ -11,10 +11,12 @@ namespace DronesAPI.Data
             _context = context ?? throw new ArgumentNullException(nameof(context));
             DroneRepository ??= new GenericRepository<Drone>(_context);
             MedicationRepository ??= new GenericRepository<Medication>(_context);
+            DroneLogRepository ??= new GenericRepository<DroneLog>(_context);
         }
 
         public IGenericRepository<Drone> DroneRepository { get; set; }
         public IGenericRepository<Medication> MedicationRepository { get; set; }
+        public IGenericRepository<DroneLog> DroneLogRepository { get; set; }
 
         public async Task<int> CommitAsync()
         {
