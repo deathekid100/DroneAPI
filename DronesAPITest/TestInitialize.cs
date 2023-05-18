@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace DronesAPITest
 {
-    public abstract class TestInitialize
+    public abstract class TestInitialize : IDisposable
     {
         public HttpClient _httpClient;
         public JsonSerializerOptions _jsonOptions;
@@ -35,6 +35,11 @@ namespace DronesAPITest
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 Converters = { new JsonStringEnumConverter() }
             };
+        }
+
+        public void Dispose()
+        {
+            application.Dispose();
         }
     }
 }

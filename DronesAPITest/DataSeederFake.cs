@@ -1,6 +1,7 @@
 ﻿
 using DronesAPI.Data;
 using DronesAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DronesAPITest
 {
@@ -15,17 +16,12 @@ namespace DronesAPITest
 
         public void SeedData()
         {
-            if (_dbContext.Drones.Any())
-            {
-                foreach (var drone in _dbContext.Drones)
-                {
-                    _dbContext.Drones.Remove(drone);
-                }
-                _dbContext.SaveChanges();
-            }
-            if (!_dbContext.Drones.Any())
-            {
-                var drones = new List<Drone>
+            //if (_dbContext.Drones.Any())
+            //{
+            //    _dbContext.Drones.RemoveRange(_dbContext.Drones);
+            //    _dbContext.SaveChanges();
+            //}
+            var drones = new List<Drone>
                 {
                     new Drone { SerialNumber = "SN001", Model = DroneModel.Lightweight, WeightLimit = 500, BatteryCapacity = 85, State = DroneState.IDLE },
                     new Drone { SerialNumber = "SN002", Model = DroneModel.Middleweight, WeightLimit = 400, BatteryCapacity = 80, State = DroneState.IDLE },
@@ -35,12 +31,11 @@ namespace DronesAPITest
                     new Drone { SerialNumber = "SN006", Model = DroneModel.Middleweight, WeightLimit = 400, BatteryCapacity = 20, State = DroneState.IDLE },
                     new Drone { SerialNumber = "SN007", Model = DroneModel.Cruiserweight, WeightLimit = 10, BatteryCapacity = 40, State = DroneState.IDLE },
                     new Drone { SerialNumber = "SN008", Model = DroneModel.Heavyweight, WeightLimit = 20, BatteryCapacity = 0, State = DroneState.IDLE },
-                    new Drone { SerialNumber = "SN009", Model = DroneModel.Lightweight, WeightLimit = 50, BatteryCapacity = 1, State = DroneState.IDLE },
+                    new Drone { SerialNumber = "SN009", Model = DroneModel.Lightweight, WeightLimit = 500, BatteryCapacity = 1, State = DroneState.IDLE },
                     new Drone { SerialNumber = "SN010", Model = DroneModel.Middleweight, WeightLimit = 500, BatteryCapacity = 2, State = DroneState.LOADED },
                 };
-                _dbContext.Drones.AddRange(drones);
-                _dbContext.SaveChanges();
-            }
+            _dbContext.Drones.AddRange(drones);
+            _dbContext.SaveChanges();
         }
     }
 }

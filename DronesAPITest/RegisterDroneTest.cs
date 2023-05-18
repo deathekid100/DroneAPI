@@ -2,29 +2,15 @@
 using DronesAPI.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DronesAPITest
 {
-    public class RegisterDroneTest
+    public class RegisterDroneTest : TestInitialize
     {
-        private HttpClient _httpClient;
-        private JsonSerializerOptions _jsonOptions;
-
-        public RegisterDroneTest()
-        {
-            var application = new WebApplicationFactory<Program>();
-            _httpClient = application.CreateDefaultClient();
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters = { new JsonStringEnumConverter() }
-            };
-        }
+        
         [Fact]
         public async Task RegisterDrone_ValidData_ShouldReturnsCreatedStatusCodeAndModelResponse()
         {
