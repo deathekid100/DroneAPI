@@ -7,7 +7,7 @@ namespace DronesAPI.Dtos
 
         public string SerialNumber { get; set; }
 
-        public DroneModel Model { get; set; }
+        public DroneModel? Model { get; set; }
 
         public double WeightLimit { get; set; }
 

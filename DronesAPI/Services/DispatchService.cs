@@ -60,7 +60,7 @@ namespace DronesAPI.Services
         public async Task<ICollection<ReadDroneDto>> GetAvailableDrones()
         {
             var availables = await _unitOfWork.DroneRepository
-                .FindAllAsync(t => t.State == DroneState.IDLE && t.BatteryCapacity > 25);
+                .FindAllAsync(t => t.State == DroneState.IDLE && t.BatteryCapacity >= 25);
 
             return _mapper.Map<ICollection<ReadDroneDto>>(availables);
         }
