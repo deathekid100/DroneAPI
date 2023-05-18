@@ -68,7 +68,7 @@ namespace DronesAPITest
         public async Task LoadInUseDrone_InvalidData_ShouldReturnsBadRequestDroneIsInUse()
         {
             // Arrange
-            var drone = dbContext.Drones.FirstOrDefault(t => t.State != DroneState.IDLE && t.BatteryCapacity > 25 && t.WeightLimit == 500);
+            var drone = dbContext.Drones.FirstOrDefault(t => t.State != DroneState.IDLE);
             var medicationsIds = dbContext.Medications
                 .Where(t => t.Weight <= drone.WeightLimit)
                 .Take(1)
